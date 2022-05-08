@@ -30,28 +30,28 @@ class Object {
 
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
-            const vector<Utils::vec3>& points,
-            const vector<Utils::vec4>& colors,
+            const vector<glm::vec3>& points,
+            const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList
         );
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
-            const vector<Utils::vec3>& points,
-            const vector<Utils::vec4>& colors,
+            const vector<glm::vec3>& points,
+            const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList,
             GLuint program
         );
 
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
-            const vector<Utils::vec2>& points,
-            const vector<Utils::vec4>& colors,
+            const vector<glm::vec2>& points,
+            const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList
         );
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
-            const vector<Utils::vec2>& points,
-            const vector<Utils::vec4>& colors,
+            const vector<glm::vec2>& points,
+            const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList,
             GLuint program
         );

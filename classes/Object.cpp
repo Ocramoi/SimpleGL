@@ -46,8 +46,8 @@ void Object::applyColorFilter(GLuint target) {
 
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
-    const vector<Utils::vec3>& points,
-    const vector<Utils::vec4>& colors,
+    const vector<glm::vec3>& points,
+    const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList,
     GLuint program
 ) {
@@ -74,8 +74,8 @@ void Object::pushElement(
 
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
-    const vector<Utils::vec3>& points,
-    const vector<Utils::vec4>& colors,
+    const vector<glm::vec3>& points,
+    const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList
 ) {
     pushElement(drawType, points, colors, elementList, defaultProgram);
@@ -83,13 +83,13 @@ void Object::pushElement(
 
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
-    const vector<Utils::vec2>& points,
-    const vector<Utils::vec4>& colors,
+    const vector<glm::vec2>& points,
+    const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList,
     GLuint program
 ) {
-    vector<Utils::vec3> points3d;
-    for (const auto& point : points) points3d.push_back({.x = point.x, .y = point.y, .z = 0.f});
+    vector<glm::vec3> points3d;
+    for (const auto& point : points) points3d.push_back({point.x, point.y, 0.f});
 
     if (elementList.empty()) {
         vector<GLuint> sequence;
@@ -114,8 +114,8 @@ void Object::pushElement(
 
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
-    const vector<Utils::vec2>& points,
-    const vector<Utils::vec4>& colors,
+    const vector<glm::vec2>& points,
+    const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList
 ) {
     pushElement(drawType, points, colors, elementList, defaultProgram);

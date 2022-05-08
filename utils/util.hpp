@@ -13,18 +13,6 @@ using std::pair;
 using std::string;
 
 namespace Utils {
-    using vec2=struct {
-        GLfloat x, y;
-    };
-
-    using vec3=struct {
-        GLfloat x, y, z;
-    };
-
-    using vec4=struct {
-        GLfloat x, y, z, h;
-    };
-
     GLuint createRenderProgram(string vShader, string fShader);
     string readFileContent(string path);
     void unsetModel(GLuint program, glm::mat4 Model = glm::Identity4);

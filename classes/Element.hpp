@@ -13,8 +13,9 @@ using std::vector;
 class Element {
     private:
         decltype(GL_TRIANGLES) drawType;
-        vector<Utils::vec3> points;
-        vector<Utils::vec4> colors;
+        vector<glm::vec3> points;
+        vector<glm::vec4> colors;
+        glm::vec3 center{0.f};
         vector<GLuint> elementList;
         GLuint program,
             vao, cbo, vbo, ebo;
@@ -22,8 +23,8 @@ class Element {
         Element(
             GLuint _program,
             decltype(GL_TRIANGLES) _drawType,
-            const vector<Utils::vec3>& _points,
-            const vector<Utils::vec4>& _colors,
+            const vector<glm::vec3>& _points,
+            const vector<glm::vec4>& _colors,
             const vector<GLuint>& _elementList
         );
         ~Element();

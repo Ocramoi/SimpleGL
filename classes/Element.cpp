@@ -3,13 +3,15 @@
 Element::Element(
     GLuint _program,
     decltype(GL_TRIANGLES) _drawType,
-    const vector<Utils::vec3>& _points,
-    const vector<Utils::vec4>& _colors,
+    const vector<glm::vec3>& _points,
+    const vector<glm::vec4>& _colors,
     const vector<GLuint>& _elementList
 ) {
     program = _program;
     drawType = _drawType;
     points = _points; colors = _colors; elementList = _elementList;
+
+    for (const auto& point : points) center += point/(1.f*points.size());
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -61,6 +63,8 @@ Element::~Element() {
 
 void Element::bind() {
     glUseProgram(program);
+    auto pTransf{glGetUniformLocation(program, "center")};
+    glUniformMatrix4fv(pTransf, 1, GL_TRUE, glm::value_ptr(center));
     glBindVertexArray(vao);
 }
 
