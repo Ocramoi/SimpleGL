@@ -73,11 +73,10 @@ void keyHandler(Window& win) {
 int main() {
     Window::initContext(16);
 
-    auto window{Window(
+    Window window{
             { 500, 500 },
             "Teste",
-            nullptr, nullptr
-        )};
+            nullptr, nullptr };
     auto renderProgram{Utils::createRenderProgram("vShader.glsl", "fShader.glsl")};
 
     Delaunay = make_unique<Object>(renderProgram);
