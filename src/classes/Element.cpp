@@ -76,4 +76,4 @@ void Element::draw() {
     unbind();
 }
 
-glm::vec3 Element::getCenter() { return center; }
+auto Element::getCenter() -> decltype(center) { return center; }

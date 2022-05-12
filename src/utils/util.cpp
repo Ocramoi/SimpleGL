@@ -15,7 +15,7 @@ using std::ios;
 
 using std::vector;
 
-string Utils::readFileContent(string path) {
+auto Utils::readFileContent(string path) -> decltype(path) {
     ifstream fStream{path, ios::in | ios::binary}; fStream.seekg(0, fStream.end);
     vector<char> rawContent(static_cast<long>(fStream.tellg()) + 1); fStream.seekg(0, fStream.beg);
     fStream.read(&rawContent[0], rawContent.size() - 1); rawContent.back() = '\0';
@@ -24,8 +24,8 @@ string Utils::readFileContent(string path) {
     return string(rawContent.begin(), rawContent.end());
 }
 
-GLuint createShader(string vPath, string fPath) {
-    string vShaderSrc = Utils::readFileContent(vPath),
+auto createShader(string vPath, string fPath) -> GLuint {
+    auto vShaderSrc = Utils::readFileContent(vPath),
         fShaderSrc = Utils::readFileContent(fPath);
 
     GLuint vShader{glCreateShader(GL_VERTEX_SHADER)},
@@ -69,7 +69,7 @@ GLuint createShader(string vPath, string fPath) {
     return vfProgram;
 }
 
-GLuint Utils::createRenderProgram(string vShader, string fShader) {
+auto Utils::createRenderProgram(string vShader, string fShader) -> GLuint {
     GLuint program = createShader(vShader, fShader);
 
     GLint linkStatus;

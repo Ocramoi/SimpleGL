@@ -60,7 +60,7 @@ Window::~Window() {
     glfwTerminate();
 }
 
-GLFWwindow* Window::get() { return _win; }
+auto Window::get() -> decltype(_win) { return _win; }
 
 void Window::clear() {
     glClear(GL_COLOR_BUFFER_BIT | (enable3d ? GL_DEPTH_BUFFER_BIT : 0));
@@ -72,7 +72,7 @@ void Window::clear(array<float, 4> Color) {
 }
 
 void Window::setPerspective(glm::mat4 Perspective) { perspective = Perspective; }
-glm::mat4 Window::getPerspective() { return perspective; }
+auto Window::getPerspective() -> decltype(perspective) { return perspective; }
 
 void Window::setPerspective(float fov, glm::vec2 z) {
     FOV = fov; zMin = z.x; zMax = z.y;

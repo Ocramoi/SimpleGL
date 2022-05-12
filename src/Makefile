@@ -15,13 +15,13 @@ DEBUG_FLAGS=-Wextra -Og -g3 -DDEBUG -std=gnu++17
 VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all --track-origins=yes -s
 LD_FLAGS:=-lGL -lglfw -lGLEW
 
-all: setup main.o
+all: setup main.o classes.o utils.o
 	$(CC) $(COMPILE_FLAGS) *.o -o $(EXEC) $(LD_FLAGS)
 
-main.o: classes.o
+main.o:
 	$(CC) $(COMPILE_FLAGS) main.cpp -c
 
-classes.o: utils.o
+classes.o:
 	$(CC) $(COMPILE_FLAGS) $(wildcard classes/*.cpp) -c
 
 utils.o:

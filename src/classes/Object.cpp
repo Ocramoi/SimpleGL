@@ -5,7 +5,7 @@ using std::make_shared;
 void Object::setDefaultProgram(GLuint program) {
     defaultProgram = program;
 }
-GLuint Object::getDefaultProgram() { return defaultProgram; }
+auto Object::getDefaultProgram() -> decltype(defaultProgram) { return defaultProgram; }
 
 void Object::updateCenter() {
     center = glm::vec3(0.f);
@@ -17,7 +17,7 @@ void Object::popElement() {
     elements.pop_back();
 }
 
-size_t Object::size() {
+auto Object::size() -> decltype(elements.size()) {
     return elements.size();
 }
 
@@ -27,7 +27,7 @@ void Object::draw() {
 }
 
 void Object::setTransform(glm::mat4 m) { transform = m; }
-glm::mat4 Object::getTransform() { return transform; }
+auto Object::getTransform() -> decltype(transform) { return transform; }
 
 void Object::applyTransform() {
     Object::applyTransform(defaultProgram);
@@ -39,7 +39,7 @@ void Object::applyTransform(GLuint target) {
 }
 
 void Object::setColorFilter(glm::mat4 m) { colorFilter = m; }
-glm::mat4 Object::getColorFilter() { return colorFilter; }
+auto Object::getColorFilter() -> decltype(colorFilter) { return colorFilter; }
 
 void Object::applyColorFilter() {
     Object::applyColorFilter(defaultProgram);
@@ -131,4 +131,4 @@ void Object::pushElement(
     pushElement(drawType, points, colors, elementList, defaultProgram);
 }
 
-glm::vec3 Object::getCenter() { return center; }
+auto Object::getCenter() -> decltype(center) { return center; }

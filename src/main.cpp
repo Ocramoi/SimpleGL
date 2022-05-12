@@ -26,7 +26,7 @@ void display(
 ) {
     win.clear();
 
-    float fTime{static_cast<float>(currentTime)};
+    auto fTime{static_cast<float>(currentTime)};
     glm::mat4 model{1.f};
     model *= glm::translate(model, -Delaunay->getCenter());
     model *= glm::rotate(model, fTime, { 0, 0, 1 });
@@ -51,10 +51,10 @@ void keyHandler(Window& win) {
         return;
     }
 
-    auto normStep = cameraStep * win.getDeltaTime();
     if (glfwGetKey(win.get(), GLFW_KEY_0) == GLFW_PRESS)
         cameraPos = cameraInit;
     else {
+        auto normStep = cameraStep * win.getDeltaTime();
         if (glfwGetKey(win.get(), GLFW_KEY_W) == GLFW_PRESS)
             cameraPos.x += normStep;
         if (glfwGetKey(win.get(), GLFW_KEY_S) == GLFW_PRESS)
