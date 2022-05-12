@@ -32,6 +32,7 @@ class Element {
         void draw();
         void bind();
         void unbind();
+        glm::vec3 getCenter();
 };
 
 #endif // ELEMENT_H_

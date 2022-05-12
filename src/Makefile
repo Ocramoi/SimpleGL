@@ -7,15 +7,25 @@
 CC=clang++
 SRC_FILES=main.cpp $(wildcard **/*.cpp)
 SRC_FILES:=$(filter-out $(wildcard **/flycheck_*.cpp), $(SRC_FILES))
-EXEC=build/main
-DEXEC=build/debug
+EXEC=../build/main
+DEXEC=../build/debug
+OBJ_FOLDER=objs
 COMPILE_FLAGS=-Wextra -Ofast -std=gnu++17
 DEBUG_FLAGS=-Wextra -Og -g3 -DDEBUG -std=gnu++17
 VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all --track-origins=yes -s
-LD_FLAGS=-lGL -lglfw -lGLEW
+LD_FLAGS:=-lGL -lglfw -lGLEW
 
-all: setup
-	$(CC) $(COMPILE_FLAGS) $(SRC_FILES) -o $(EXEC) $(LD_FLAGS)
+all: setup main.o
+	$(CC) $(COMPILE_FLAGS) *.o -o $(EXEC) $(LD_FLAGS)
+
+main.o: classes.o
+	$(CC) $(COMPILE_FLAGS) main.cpp -c
+
+classes.o: utils.o
+	$(CC) $(COMPILE_FLAGS) $(wildcard classes/*.cpp) -c
+
+utils.o:
+	$(CC) $(COMPILE_FLAGS) $(wildcard utils/*.cpp) -c
 
 setup:
 	rm -rf build
@@ -29,5 +39,10 @@ debug:
 
 val:
 	valgrind $(VALGRIND_FLAGS) ./$(DEXEC)
+
+clear:
+	rm *.o
+
+.PHONY: all clear val run
 
 # end

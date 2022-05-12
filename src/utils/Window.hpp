@@ -20,24 +20,30 @@ using std::array;
 class Window {
     private:
         GLFWwindow* _win;
-        float FOV{60.f}, zMin{0.01f}, zMax{1000.f};
+        float FOV{60.f}, zMin{0.01f}, zMax{1000.f},
+                deltaTime{1.f};
+        decltype(glfwGetTime()) lastFrame{0};
         glm::mat4 perspective{1.f};
         pair<float, float> wSize;
+        bool enable3d;
     public:
         static void initContext(size_t samples);
-        static void clear();
-        static void clear(array<float, 4> Color);
+        void clear();
+        void clear(array<float, 4> Color);
         GLFWwindow* get();
         Window(
             const pair<float, float>& size,
             const string& title,
             GLFWmonitor *monitor,
-            GLFWwindow *share
+            GLFWwindow *share,
+            bool context3d = true
         );
         ~Window();
         void setPerspective(glm::mat4 Perspective = glm::Identity4);
         void setPerspective(float fov, glm::vec2 z);
         glm::mat4 getPerspective();
+        void update();
+        auto getDeltaTime() -> float;
 };
 
 #endif // WINDOW_H_

@@ -63,8 +63,6 @@ Element::~Element() {
 
 void Element::bind() {
     glUseProgram(program);
-    auto pTransf{glGetUniformLocation(program, "center")};
-    glUniformMatrix4fv(pTransf, 1, GL_TRUE, glm::value_ptr(center));
     glBindVertexArray(vao);
 }
 
@@ -77,3 +75,5 @@ void Element::draw() {
     glDrawElements(drawType, elementList.size(), GL_UNSIGNED_INT, nullptr);
     unbind();
 }
+
+glm::vec3 Element::getCenter() { return center; }

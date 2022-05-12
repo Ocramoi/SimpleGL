@@ -23,7 +23,8 @@ Window::Window(
     const pair<float, float>& size,
     const string& title,
     GLFWmonitor *monitor,
-    GLFWwindow *share
+    GLFWwindow *share,
+    bool context3d
 ) {
     _win = glfwCreateWindow(
         size.first, size.second,
@@ -36,6 +37,7 @@ Window::Window(
     }
     wSize = size;
 
+    enable3d = context3d;
     glfwMakeContextCurrent(_win);
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
@@ -61,7 +63,7 @@ Window::~Window() {
 GLFWwindow* Window::get() { return _win; }
 
 void Window::clear() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | (enable3d ? GL_DEPTH_BUFFER_BIT : 0));
 }
 
 void Window::clear(array<float, 4> Color) {
@@ -75,4 +77,13 @@ glm::mat4 Window::getPerspective() { return perspective; }
 void Window::setPerspective(float fov, glm::vec2 z) {
     FOV = fov; zMin = z.x; zMax = z.y;
     setPerspective(glm::perspective(glm::radians(FOV), wSize.first/wSize.second, zMin, zMax));
+}
+
+auto Window::getDeltaTime() -> decltype(deltaTime) { return deltaTime; }
+
+void Window::update() {
+    glfwSwapBuffers(get());
+    auto curFrame{glfwGetTime()};
+    deltaTime = curFrame - lastFrame;
+    lastFrame = curFrame;
 }

@@ -20,9 +20,12 @@ class Object {
     private:
         GLuint defaultProgram;
         vector<shared_ptr<Element>> elements;
-        glm::vec3 pos{0, 0, 0};
+        glm::vec3 pos{0, 0, 0},
+                center{0.f};
         glm::mat4 transform{1.f},
                 colorFilter{1.f};
+
+        void updateCenter();
     public:
         Object(GLuint program) : defaultProgram(program) {};
         void setDefaultProgram(GLuint program);
@@ -69,6 +72,7 @@ class Object {
         void applyColorFilter();
         void applyColorFilter(GLuint target);
 
+        glm::vec3 getCenter();
         void draw();
 };
 

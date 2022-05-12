@@ -7,6 +7,12 @@ void Object::setDefaultProgram(GLuint program) {
 }
 GLuint Object::getDefaultProgram() { return defaultProgram; }
 
+void Object::updateCenter() {
+    center = glm::vec3(0.f);
+    for (const auto& el : elements)
+        center += el->getCenter()/(1.f*elements.size());
+}
+
 void Object::popElement() {
     elements.pop_back();
 }
@@ -70,6 +76,8 @@ void Object::pushElement(
             elementList
         ));
     }
+
+    updateCenter();
 }
 
 void Object::pushElement(
@@ -110,6 +118,8 @@ void Object::pushElement(
             elementList
         ));
     }
+
+    updateCenter();
 }
 
 void Object::pushElement(
@@ -120,3 +130,5 @@ void Object::pushElement(
 ) {
     pushElement(drawType, points, colors, elementList, defaultProgram);
 }
+
+glm::vec3 Object::getCenter() { return center; }
