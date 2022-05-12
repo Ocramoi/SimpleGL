@@ -26,10 +26,11 @@ class Window {
         glm::mat4 perspective{1.f};
         pair<float, float> wSize;
         bool enable3d;
+        pair<double, double> lastCursor{0, 0};
     public:
         static void initContext(size_t samples);
         void clear();
-        void clear(array<float, 4> Color);
+        void clear(const array<float, 4>& Color);
         GLFWwindow* get();
         Window(
             const pair<float, float>& size,
@@ -39,11 +40,13 @@ class Window {
             bool context3d = true
         );
         ~Window();
-        void setPerspective(glm::mat4 Perspective = glm::Identity4);
+        void setPerspective(const glm::mat4& Perspective = glm::Identity4);
         void setPerspective(float fov, glm::vec2 z);
         glm::mat4 getPerspective();
         void update();
-        auto getDeltaTime() -> float;
+        float getDeltaTime();
+        pair<double, double> updateCursor();
+        pair<double, double> getLastCursor();
 };
 
 #endif // WINDOW_H_

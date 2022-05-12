@@ -66,12 +66,12 @@ void Window::clear() {
     glClear(GL_COLOR_BUFFER_BIT | (enable3d ? GL_DEPTH_BUFFER_BIT : 0));
 }
 
-void Window::clear(array<float, 4> Color) {
+void Window::clear(const array<float, 4>& Color) {
     glClearColor(Color[0], Color[1], Color[2], Color[3]);
     clear();
 }
 
-void Window::setPerspective(glm::mat4 Perspective) { perspective = Perspective; }
+void Window::setPerspective(const glm::mat4& Perspective) { perspective = Perspective; }
 auto Window::getPerspective() -> decltype(perspective) { return perspective; }
 
 void Window::setPerspective(float fov, glm::vec2 z) {
@@ -86,4 +86,10 @@ void Window::update() {
     auto curFrame{glfwGetTime()};
     deltaTime = curFrame - lastFrame;
     lastFrame = curFrame;
+}
+
+auto Window::getLastCursor() -> decltype(lastCursor) { return lastCursor; }
+auto Window::updateCursor() -> decltype(lastCursor) {
+    glfwGetCursorPos(_win, &lastCursor.first, &lastCursor.second);
+    return getLastCursor();
 }
