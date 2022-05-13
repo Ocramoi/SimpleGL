@@ -13,4 +13,5 @@ void main(void) {
     _color = color;
     _position = position;
     gl_Position = modelMatrix * vec4(position, 1.0) * viewMatrix * projectionMatrix;
+    // gl_Position = modelMatrix * vec4(position, 1.0);
 }

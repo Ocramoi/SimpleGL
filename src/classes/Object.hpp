@@ -20,7 +20,7 @@ class Object {
     private:
         GLuint defaultProgram;
         vector<shared_ptr<Element>> elements;
-        glm::vec3 pos{0, 0, 0},
+        glm::vec3 position{0.f},
                 center{0.f};
         glm::mat4 transform{1.f},
                 colorFilter{1.f};
@@ -62,15 +62,22 @@ class Object {
         void popElement();
         size_t size();
 
-        void setTransform(glm::mat4 m);
+        void setTransform(const glm::mat4& m);
         glm::mat4 getTransform();
         void applyTransform();
         void applyTransform(GLuint target);
+        void applyTransform(const glm::mat4& m);
+        void applyTransform(const glm::mat4& m, GLuint target);
 
-        void setColorFilter(glm::mat4 m);
+        void setColorFilter(const glm::mat4& m);
         glm::mat4 getColorFilter();
         void applyColorFilter();
         void applyColorFilter(GLuint target);
+        void applyColorFilter(const glm::mat4& m);
+        void applyColorFilter(const glm::mat4& m, GLuint target);
+
+        glm::vec3 getPosition();
+        void setPosition(const glm::vec3& pos);
 
         glm::vec3 getCenter();
         void draw();

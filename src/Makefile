@@ -15,17 +15,17 @@ DEBUG_FLAGS=-Wextra -Og -g3 -DDEBUG -std=gnu++17
 VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all --track-origins=yes -s
 LD_FLAGS:=-lGL -lglfw -lGLEW
 
-all: setup main.o classes.o utils.o
+all: setup classes.o utils.o main.o
 	$(CC) $(COMPILE_FLAGS) *.o -o $(EXEC) $(LD_FLAGS)
 
-main.o:
+main.o: main.cpp
 	$(CC) $(COMPILE_FLAGS) main.cpp -c
 
-classes.o:
-	$(CC) $(COMPILE_FLAGS) $(wildcard classes/*.cpp) -c
+classes.o: $(filter-out $(wildcard **/flycheck_*.cpp), $(wildcard classes/*.cpp))
+	$(CC) $(COMPILE_FLAGS) $(filter-out $(wildcard **/flycheck_*.cpp), $(wildcard classes/*.cpp)) -c
 
-utils.o:
-	$(CC) $(COMPILE_FLAGS) $(wildcard utils/*.cpp) -c
+utils.o: $(filter-out $(wildcard **/flycheck_*.cpp), $(wildcard utils/*.cpp))
+	$(CC) $(COMPILE_FLAGS) $(filter-out $(wildcard **/flycheck_*.cpp), $(wildcard utils/*.cpp)) -c
 
 setup:
 	rm -rf build
@@ -34,8 +34,8 @@ setup:
 run:
 	./$(EXEC)
 
-debug:
-	$(CC) $(DEBUG_FLAGS) $(SRC_FILES) -o $(DEXEC) $(LD_FLAGS)
+# debug:
+# 	$(CC) $(DEBUG_FLAGS) $(SRC_FILES) -o $(DEXEC) $(LD_FLAGS)
 
 val:
 	valgrind $(VALGRIND_FLAGS) ./$(DEXEC)

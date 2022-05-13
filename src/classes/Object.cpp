@@ -26,11 +26,11 @@ void Object::draw() {
         el->draw();
 }
 
-void Object::setTransform(glm::mat4 m) { transform = m; }
+void Object::setTransform(const glm::mat4& m) { transform = m; }
 auto Object::getTransform() -> decltype(transform) { return transform; }
 
 void Object::applyTransform() {
-    Object::applyTransform(defaultProgram);
+    applyTransform(defaultProgram);
 }
 
 void Object::applyTransform(GLuint target) {
@@ -38,14 +38,35 @@ void Object::applyTransform(GLuint target) {
     glUniformMatrix4fv(matTransf, 1, GL_TRUE, glm::value_ptr(transform));
 }
 
-void Object::setColorFilter(glm::mat4 m) { colorFilter = m; }
+void Object::applyTransform(const glm::mat4& m) {
+    setTransform(m);
+    applyTransform(defaultProgram);
+}
+
+void Object::applyTransform(const glm::mat4& m, GLuint target) {
+    setTransform(m);
+    applyTransform(target);
+}
+
+void Object::setColorFilter(const glm::mat4& m) { colorFilter = m; }
 auto Object::getColorFilter() -> decltype(colorFilter) { return colorFilter; }
 
 void Object::applyColorFilter() {
-    Object::applyColorFilter(defaultProgram);
+    applyColorFilter(defaultProgram);
 }
 
 void Object::applyColorFilter(GLuint target) {
+    auto matColor{glGetUniformLocation(target, "colorMatrix")};
+    glUniformMatrix4fv(matColor, 1, GL_TRUE, glm::value_ptr(colorFilter));
+}
+
+void Object::applyColorFilter(const glm::mat4& m) {
+    setColorFilter(m);
+    applyColorFilter(defaultProgram);
+}
+
+void Object::applyColorFilter(const glm::mat4& m, GLuint target) {
+    setColorFilter(m);
     auto matColor{glGetUniformLocation(target, "colorMatrix")};
     glUniformMatrix4fv(matColor, 1, GL_TRUE, glm::value_ptr(colorFilter));
 }
@@ -131,4 +152,7 @@ void Object::pushElement(
     pushElement(drawType, points, colors, elementList, defaultProgram);
 }
 
-auto Object::getCenter() -> decltype(center) { return center; }
+auto Object::getCenter() -> decltype(center) { return position + center; }
+
+glm::vec3 Object::getPosition() { return position; }
+void Object::setPosition(const glm::vec3 &pos) { position = pos; }

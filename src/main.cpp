@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <glm/gtx/string_cast.hpp>
+
 #include "utils/util.hpp"
 #include "utils/Window.hpp"
 #include "classes/Transform.hpp"
@@ -28,18 +30,15 @@ void display(
 
     auto fTime{static_cast<float>(currentTime)};
     glm::mat4 model{1.f};
-    model *= glm::translate(model, -Delaunay->getCenter());
-    model *= glm::rotate(model, fTime, { 0, 0, 1 });
-    model *= glm::rotate(model, fTime/2, { 0, 1, 0 });
-    model *= glm::rotate(model, fTime/3, { 1, 0, 0 });
-    model *= glm::translate(model, Delaunay->getCenter());
+    model = glm::translate(model, { cos(currentTime)*.5f, 0, 0 });
+    model = glm::rotate(model, fTime, { 0, 0, 1 });
+    model = glm::rotate(model, fTime/2, { 0, 1, 0 });
+    model = glm::rotate(model, fTime/3, { 1, 0, 0 });
 
     Utils::setProjection(Delaunay->getDefaultProgram(), win.getPerspective());
     Utils::setView(Delaunay->getDefaultProgram(), glm::translate(glm::Identity4, cameraPos));
-    Delaunay->setColorFilter(glm::Identity4);
     Delaunay->applyColorFilter();
-    Delaunay->setTransform(model);
-    Delaunay->applyTransform();
+    Delaunay->applyTransform(glm::transpose(model));
     Delaunay->draw();
 
     win.update();
