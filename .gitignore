@@ -1,5 +1,6 @@
 # Build files
 build/*
+flycheck_*.cpp
 
 # Prerequisites
 *.d
