@@ -34,8 +34,8 @@ setup:
 run:
 	./$(EXEC)
 
-# debug:
-# 	$(CC) $(DEBUG_FLAGS) $(SRC_FILES) -o $(DEXEC) $(LD_FLAGS)
+debug:
+	$(CC) $(DEBUG_FLAGS) main.cpp $(filter-out $(wildcard **/flycheck_*.cpp), $(wildcard **/*.cpp)) -o $(DEXEC) $(LD_FLAGS)
 
 val:
 	valgrind $(VALGRIND_FLAGS) ./$(DEXEC)
@@ -43,6 +43,6 @@ val:
 clear:
 	rm *.o
 
-.PHONY: all clear val run
+.PHONY: all clear val run setup
 
 # end

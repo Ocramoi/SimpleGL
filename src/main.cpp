@@ -7,10 +7,11 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-#include "utils/util.hpp"
-#include "utils/Window.hpp"
-#include "classes/Transform.hpp"
-#include "classes/Object.hpp"
+#include "./utils/util.hpp"
+#include "./utils/Window.hpp"
+#include "./classes/Transform.hpp"
+#include "./classes/Object.hpp"
+#include "./classes/Camera.hpp"
 
 using namespace std;
 
@@ -18,9 +19,7 @@ void keyHandler(GLFWwindow* win);
 void display(GLFWwindow* win, GLuint rProgram, GLuint vao, double currentTime);
 
 unique_ptr<Object> Delaunay;
-glm::vec3 cameraInit{0, 0, -1},
-    cameraPos{cameraInit};
-auto cameraStep{2.f};
+unique_ptr<Camera> camera;
 
 void display(
     Window& win,
@@ -36,7 +35,7 @@ void display(
     model = glm::rotate(model, fTime/3, { 1, 0, 0 });
 
     Utils::setProjection(Delaunay->getDefaultProgram(), win.getPerspective());
-    Utils::setView(Delaunay->getDefaultProgram(), glm::translate(glm::Identity4, cameraPos));
+    camera->setView(Delaunay->getDefaultProgram());
     Delaunay->applyColorFilter();
     Delaunay->applyTransform(glm::transpose(model));
     Delaunay->draw();
@@ -51,32 +50,40 @@ void keyHandler(Window& win) {
     }
 
     if (glfwGetKey(win.get(), GLFW_KEY_0) == GLFW_PRESS)
-        cameraPos = cameraInit;
+        camera->resetTransform();
     else {
-        auto normStep = cameraStep * win.getDeltaTime();
+        auto normDir{win.getDeltaTime()};
         if (glfwGetKey(win.get(), GLFW_KEY_W) == GLFW_PRESS)
-            cameraPos.x += normStep;
+            camera->move({ normDir, 0, 0 });
         if (glfwGetKey(win.get(), GLFW_KEY_S) == GLFW_PRESS)
-            cameraPos.x -= normStep;
+            camera->move({ -normDir, 0, 0 });
         if (glfwGetKey(win.get(), GLFW_KEY_A) == GLFW_PRESS)
-            cameraPos.y -= normStep;
+            camera->move({ 0, -normDir, 0 });
         if (glfwGetKey(win.get(), GLFW_KEY_D) == GLFW_PRESS)
-            cameraPos.y += normStep;
+            camera->move({ 0, normDir, 0 });
         if (glfwGetKey(win.get(), GLFW_KEY_Q) == GLFW_PRESS)
-            cameraPos.z -= normStep;
+            camera->move({ 0, 0, -normDir });
         if (glfwGetKey(win.get(), GLFW_KEY_E) == GLFW_PRESS)
-            cameraPos.z += normStep;
+            camera->move({ 0, 0, normDir });
     }
+}
+
+void mouseHandler(Window& win) {
+    auto last{win.getLastCursor()},
+        cur{win.updateCursor()};
+    camera->rotate({ cur.first - last.first, cur.second - last.second });
 }
 
 int main() {
     Window::initContext(16);
 
     Window window{
-            { 500, 500 },
+            { 800, 500 },
             "Teste",
             nullptr, nullptr };
     auto renderProgram{Utils::createRenderProgram("vShader.glsl", "fShader.glsl")};
+
+    camera = make_unique<Camera>(glm::vec3{ 0, 0, -1 }, 2.f);
 
     Delaunay = make_unique<Object>(renderProgram);
     Delaunay->pushElement(
@@ -97,6 +104,7 @@ int main() {
         display(window, glfwGetTime());
         glfwPollEvents();
         keyHandler(window);
+        mouseHandler(window);
 
         auto err{glGetError()};
         if (err != GL_NO_ERROR) cerr << "OpenGL error: " << err << endl;

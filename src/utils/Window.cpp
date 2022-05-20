@@ -53,8 +53,15 @@ Window::Window(
     cout << "OpenGL version supported: " << version << endl;
 
     setPerspective(FOV, { zMin, zMax });
+
+    setupInput();
 }
 
+void Window::setupInput() {
+    if (glfwRawMouseMotionSupported()) glfwSetInputMode(_win, GLFW_RAW_MOUSE_MOTION, GL_TRUE);
+    glfwSetInputMode(_win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    updateCursor();
+}
 Window::~Window() {
     glfwDestroyWindow(_win);
     glfwTerminate();
@@ -89,7 +96,14 @@ void Window::update() {
 }
 
 auto Window::getLastCursor() -> decltype(lastCursor) { return lastCursor; }
+auto Window::updateCursor(pair<double, double> pos) -> decltype(lastCursor) {
+    lastCursor = pos;
+    return getLastCursor();
+}
 auto Window::updateCursor() -> decltype(lastCursor) {
     glfwGetCursorPos(_win, &lastCursor.first, &lastCursor.second);
     return getLastCursor();
 }
+
+void Window::setCursorPosCallback(GLFWcursorposfun callback) { glfwSetCursorPosCallback(get(), callback); }
+void Window::setKeyCallback(GLFWkeyfun callback) { glfwSetKeyCallback(get(), callback); }

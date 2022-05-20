@@ -29,6 +29,7 @@ class Window {
         pair<double, double> lastCursor{0, 0};
     public:
         static void initContext(size_t samples);
+        void setupInput();
         void clear();
         void clear(const array<float, 4>& Color);
         GLFWwindow* get();
@@ -46,7 +47,10 @@ class Window {
         void update();
         float getDeltaTime();
         pair<double, double> updateCursor();
+        pair<double, double> updateCursor(pair<double, double> pos);
         pair<double, double> getLastCursor();
+        void setCursorPosCallback(GLFWcursorposfun callback);
+        void setKeyCallback(GLFWkeyfun callback);
 };
 
 #endif // WINDOW_H_
