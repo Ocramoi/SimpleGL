@@ -5,10 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <glm/gtx/string_cast.hpp>
-
 #include "./utils/util.hpp"
 #include "./utils/Window.hpp"
+#include "./utils/Settings.hpp"
 #include "./classes/Transform.hpp"
 #include "./classes/Object.hpp"
 #include "./classes/Camera.hpp"
@@ -75,15 +74,24 @@ void mouseHandler(Window& win) {
 }
 
 int main() {
-    Window::initContext(16);
+    Settings settings{"settings.conf"};
 
+    if (settings.getValue<int>("SAMPLES").has_value())
+        Window::initContext(settings.getValue<int>("SAMPLES").value());
+    else
+        Window::initContext(16);
+
+    pair<float, float> size{
+        settings.getValue<float>("WIDTH").has_value() ? settings.getValue<float>("WIDTH").value() : 800,
+        settings.getValue<float>("HEIGHT").has_value() ? settings.getValue<float>("HEIGHT").value() : 500};
     Window window{
-            { 800, 500 },
+            size,
             "Teste",
             nullptr, nullptr };
     auto renderProgram{Utils::createRenderProgram("vShader.glsl", "fShader.glsl")};
 
     camera = make_unique<Camera>(glm::vec3{ 0, 0, -1 }, 2.f);
+    camera->setSensitivity(0.2f);
 
     Delaunay = make_unique<Object>(renderProgram);
     Delaunay->pushElement(

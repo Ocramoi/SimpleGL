@@ -29,7 +29,13 @@ void Camera::rotate(const glm::vec2 &_offset) {
     yaw += offset.x;
     if (yaw >= 360.f) yaw -= 360.f;
     if (yaw <= -360.f) yaw += 360.f;
-    pitch = std::clamp(pitch - offset.y, -90.f, 90.f);
+
+    if (unclip) {
+        pitch -= offset.y;
+        if (pitch >= 360.f) pitch -= 360.f;
+        if (pitch <= -360.f) pitch += 360.f;
+    } else
+        pitch = std::clamp(pitch - offset.y, -90.f, 90.f);
 
     glm::vec3 _front{0.f};
     _front.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
@@ -48,3 +54,6 @@ void Camera::move(const glm::vec3& _direction) {
 }
 
 void Camera::setView(GLuint program) { Utils::setView(program, transform); }
+
+void Camera::setUnclip(bool _unclip) { unclip = _unclip; }
+auto Camera::getUnclip() -> decltype(unclip) { return unclip; }

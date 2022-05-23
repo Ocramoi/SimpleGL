@@ -23,15 +23,20 @@ class Camera {
             yaw{dYaw},
             dPitch{0.f},
             pitch{dPitch};
+        bool unclip{true};
         glm::mat4 transform{1.f};
         void updateTransform();
     public:
-        Camera(const glm::vec3& init, float _step) : anchor(init),
-                                                     position(init),
-                                                     step(_step) {
+        Camera(const glm::vec3& init, float _step, bool _unclip = true) :
+            anchor(init),
+            position(init),
+            step(_step),
+            unclip(_unclip) {
             rotate({ 0, 0 });
         };
 
+        void setUnclip(bool _unclip);
+        bool getUnclip();
         void setSensitivity(float _sensitivity);
         float getSensitivity();
         void setStep(float _step);
