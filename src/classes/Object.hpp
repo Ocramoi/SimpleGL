@@ -7,8 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SOIL/SOIL.h>
 
 #include <vector>
 #include <memory>
@@ -18,7 +17,6 @@
 
 using std::vector;
 using std::shared_ptr;
-
 
 typedef struct _textureInfo {
     std::string texturePath;
@@ -33,7 +31,8 @@ class Object {
                 center{0.f};
         glm::mat4 transform{1.f},
                 colorFilter{1.f};
-        std::vector<TextureInfo> textures;
+        bool textured{false};
+        GLuint textureId;
 
         void updateCenter();
     public:
@@ -93,12 +92,12 @@ class Object {
         void applyColorFilter(const glm::mat4& m);
         void applyColorFilter(const glm::mat4& m, GLuint target);
 
-        void applyTexture(std::vector<GLuint> &textureIDs);
+        bool loadFromFile(const string& objPath, const string& texturePath);
+        // void applyTexture(std::vector<GLuint> &textureIDs);
 
         glm::vec3 getPosition();
         void setPosition(const glm::vec3& pos);
 
-        glm::vec3 getCenter();
         void draw();
 };
 

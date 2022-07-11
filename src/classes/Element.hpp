@@ -16,11 +16,12 @@ class Element {
         vector<glm::vec3> points, 
                           normals;
         vector<glm::vec4> colors;
-        std::vector<glm::vec2> uvs;
-        glm::vec3 center{0.f};
-        vector<GLuint> elementList;
+        vector<glm::vec2> uvs;
+        vector<GLuint> elementList,
+            textureIDs;
+        vector<int> textureGroups;
         GLuint program,
-            vao, cbo, vbo, ebo;
+            vao, cbo, vbo, uvo, no, ebo;
     public:
         Element(
             GLuint _program,
@@ -36,7 +37,6 @@ class Element {
         void draw();
         void bind();
         void unbind();
-        glm::vec3 getCenter();
 };
 
 #endif // ELEMENT_H_

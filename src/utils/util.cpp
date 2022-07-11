@@ -4,10 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
-
 
 using std::exit;
 using std::cout;
@@ -113,11 +109,11 @@ void Utils::setView(GLuint program, glm::mat4 Model) {
     glUniformMatrix4fv(vTransf, 1, GL_TRUE, glm::value_ptr(Model));
 }
 
-bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<glm::vec3>& normals, std::vector<int>& textureGroups){
-    std::vector<unsigned int > vertexIndices, uvIndices, normalIndices;
-    std::vector<glm::vec3> tempVertices;
-    std::vector<glm::vec2> tempUvs;
-    std::vector<glm::vec3> tempNormals;
+bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<glm::vec3>& normals){
+    vector<unsigned int> vertexIndices, uvIndices, normalIndices;
+    vector<glm::vec3> tempVertices;
+    vector<glm::vec2> tempUvs;
+    vector<glm::vec3> tempNormals;
 
     bool firstGroup = true;
     int numberOfVertices = 0;
@@ -128,15 +124,9 @@ bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertice
     } 
 
     while (true) {
-
-
-        char lineHeader[128];
+        char lineHeader[512];
         int res = fscanf(file, "%s", lineHeader);
-        std::cout << lineHeader;
-
-        if (res == EOF) {
-            break; 
-        }
+        if (res == EOF) break;
 
         // Reads vertices, textures, normals, faces and texture groups
         if (strcmp(lineHeader, "v") == 0) {
@@ -174,19 +164,10 @@ bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertice
             normalIndices.push_back(normalIndex[0]);
             normalIndices.push_back(normalIndex[1]);
             normalIndices.push_back(normalIndex[2]);
-            
-            numberOfVertices += 3;
-
-        } else if (strcmp(lineHeader, "g") == 0 || strcmp(lineHeader, "usemtl") == 0) { 
-            if (firstGroup) {
-                firstGroup = false;
-            } else {
-                textureGroups.push_back(numberOfVertices);
-                numberOfVertices = 0; 
-            }
+        } else {
+            fscanf(file, "[^\n]");
         }
     }
-    textureGroups.push_back(numberOfVertices);
 
     for (unsigned int i = 0; i < vertexIndices.size(); i++) {
         unsigned int vertexIndex = vertexIndices[i];
@@ -209,11 +190,3 @@ bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertice
     fclose(file);
     return true;
 }
-
-// void Utils::loadObject(GLuint program, std::string filePath, std::vector<TextureInfo> textures, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals, std::vector<glm::vec2>& uvs){
-    
-//     //Se houve erro em abrir o .obj joga um excecao
-//     if (!loadObjectFromFile(filePath.c_str(), vertices, uvs, normals, textureGroups)){
-//         throw("Unable to get an object from the file");
-//     }
-// }

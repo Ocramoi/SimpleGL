@@ -20,8 +20,6 @@ void display(GLFWwindow* win, GLuint rProgram, GLuint vao, double currentTime);
 unique_ptr<Object> Delaunay;
 unique_ptr<Camera> camera;
 
-std::vector<int> textureGroups;
-
 void display(
     Window& win,
     const double& currentTime
@@ -30,6 +28,7 @@ void display(
 
     auto fTime{static_cast<float>(currentTime)};
     glm::mat4 model{1.f};
+    model = glm::scale(model, { 0.1, 0.1, 0.1 });
     model = glm::translate(model, { cos(currentTime)*.5f, 0, 0 });
     model = glm::rotate(model, fTime, { 0, 0, 1 });
     model = glm::rotate(model, fTime/2, { 0, 1, 0 });
@@ -96,37 +95,11 @@ int main() {
     camera->setSensitivity(0.2f);
 
     Delaunay = make_unique<Object>(renderProgram);
-
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals;
-    std::vector<TextureInfo> textures;
-    string filePath = "/home/random/Documents/2022.1/Computação Gráfica/T2/SimpleGL/src/build/sun.obj";
-    if (!Utils::loadObjectFromFile(filePath.c_str(), vertices, uvs, normals, textureGroups)){
-        printf("oops");
-        return 0;
+    if (!Delaunay->loadFromFile("../assets/sun.obj", "../assets/sun.jpg")) {
+        cerr << "Error loading model!" << endl;
+        Utils::deletePrograms(renderProgram);
+        return 1;
     }
-    
-    std::vector<GLuint> elementList{};
-    for (int i = 0; i < int(vertices.size()); ++i) {
-        elementList.push_back(i);
-    }
-
-    Delaunay->pushElement(
-        GL_TRIANGLE_STRIP,
-        vertices,
-        normals,
-        uvs,
-        {{ 0, 0, 1, 0 }},
-        elementList
-
-    );
-
-    for(auto i : elementList){
-        std::cout << i << endl;
-    }
-
-    std::cout << elementList.size() << endl;
 
     window.clear({ 1., 1., 1., 1. });
     while (!glfwWindowShouldClose(window.get())) {

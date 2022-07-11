@@ -7,12 +7,6 @@ void Object::setDefaultProgram(GLuint program) {
 }
 auto Object::getDefaultProgram() -> decltype(defaultProgram) { return defaultProgram; }
 
-void Object::updateCenter() {
-    center = glm::vec3(0.f);
-    for (const auto& el : elements)
-        center += el->getCenter()/(1.f*elements.size());
-}
-
 void Object::popElement() {
     elements.pop_back();
 }
@@ -22,6 +16,16 @@ auto Object::size() -> decltype(elements.size()) {
 }
 
 void Object::draw() {
+    if (textured) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glUniform1i(3, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+
     for (const auto& el : elements)
         el->draw();
 }
@@ -71,7 +75,6 @@ void Object::applyColorFilter(const glm::mat4& m, GLuint target) {
     glUniformMatrix4fv(matColor, 1, GL_TRUE, glm::value_ptr(colorFilter));
 }
 
-
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
     const vector<glm::vec3>& points,
@@ -104,8 +107,6 @@ void Object::pushElement(
             elementList
         ));
     }
-
-    updateCenter();
 }
 
 void Object::pushElement(
@@ -154,8 +155,6 @@ void Object::pushElement(
             elementList
         ));
     }
-
-    updateCenter();
 }
 
 void Object::pushElement(
@@ -169,28 +168,36 @@ void Object::pushElement(
     pushElement(drawType, points, normals, uvs, colors, elementList, defaultProgram);
 }
 
-auto Object::getCenter() -> decltype(center) { return position + center; }
-
-glm::vec3 Object::getPosition() { return position; }
+auto Object::getPosition() -> decltype(getPosition()) { return position; }
 void Object::setPosition(const glm::vec3 &pos) { position = pos; }
- 
-void Object::applyTexture (std::vector<GLuint> &textureIDs) {
-    SDL_Surface *image;
-    for (unsigned int i = 0; i < textures.size(); i++){ 
-        
-        image = IMG_Load(textures[i].texturePath.c_str()); 
-        if (image == NULL){
-            throw("Unable to get a texture from the file");
-        }
 
-        glGenTextures(1, &textureIDs[i]);
-        glBindTexture(GL_TEXTURE_2D, textureIDs[i]); 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->w, image->h, 0, textures[i].format, GL_UNSIGNED_BYTE, image->pixels);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+auto Object::loadFromFile(
+    const string &objPath,
+    const string &texturePath
+) -> decltype(loadFromFile(objPath, texturePath)) {
+    vector<glm::vec3> vertices,
+        normals;
+    vector<glm::vec2> uvs;
+    if (!Utils::loadObjectFromFile(objPath.c_str(), vertices, uvs, normals))
+        return false;
+
+    int w, h, c;
+    unsigned char* image = SOIL_load_image(texturePath.c_str(), &w, &h, &c, SOIL_LOAD_RGB);
+    if (image == NULL) throw("Unable to get a texture from the file");
+    glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    textured = true;
+
+    vector<glm::vec4> tmpColors{vertices.size(), {1, 1, 1, 1}};
+    pushElement(GL_TRIANGLE_STRIP, vertices, normals, uvs, tmpColors, {});
+    SOIL_free_image_data(image);
+
+    return true;
 }

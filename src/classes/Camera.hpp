@@ -23,7 +23,7 @@ class Camera {
             yaw{dYaw},
             dPitch{0.f},
             pitch{dPitch};
-        bool unclip{true};
+        bool unclip;
         glm::mat4 transform{1.f};
         void updateTransform();
     public:

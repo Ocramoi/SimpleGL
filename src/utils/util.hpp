@@ -20,6 +20,7 @@
 using std::unique_ptr;
 using std::pair;
 using std::string;
+using std::vector;
 
 namespace Utils {    
     GLuint createRenderProgram(string vShader, string fShader);
@@ -36,7 +37,12 @@ namespace Utils {
         deletePrograms(next...);
     };
     
-    bool loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<glm::vec3>& normals, std::vector<int>& textureGroups);
+    bool loadObjectFromFile(
+        const char* path,
+        std::vector<glm::vec3>& vertices,
+        std::vector<glm::vec2>& uvs,
+        std::vector<glm::vec3>& normals
+    );
 };
 
 #endif // UTIL_H_
