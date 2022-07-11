@@ -13,8 +13,10 @@ using std::vector;
 class Element {
     private:
         decltype(GL_TRIANGLES) drawType;
-        vector<glm::vec3> points;
+        vector<glm::vec3> points, 
+                          normals;
         vector<glm::vec4> colors;
+        std::vector<glm::vec2> uvs;
         glm::vec3 center{0.f};
         vector<GLuint> elementList;
         GLuint program,
@@ -24,6 +26,8 @@ class Element {
             GLuint _program,
             decltype(GL_TRIANGLES) _drawType,
             const vector<glm::vec3>& _points,
+            const vector<glm::vec3>& _normals,
+            const vector<glm::vec2>& uvs,
             const vector<glm::vec4>& _colors,
             const vector<GLuint>& _elementList
         );

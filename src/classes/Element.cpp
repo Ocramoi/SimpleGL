@@ -4,12 +4,14 @@ Element::Element(
     GLuint _program,
     decltype(GL_TRIANGLES) _drawType,
     const vector<glm::vec3>& _points,
+    const vector<glm::vec3>& _normals,
+    const vector<glm::vec2>& _uvs,
     const vector<glm::vec4>& _colors,
     const vector<GLuint>& _elementList
 ) {
     program = _program;
     drawType = _drawType;
-    points = _points; colors = _colors; elementList = _elementList;
+    points = _points; colors = _colors; elementList = _elementList; normals = _normals; uvs = _uvs;
 
     for (const auto& point : points) center += point/(1.f*points.size());
 

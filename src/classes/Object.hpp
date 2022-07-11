@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #include <vector>
 #include <memory>
@@ -16,6 +19,12 @@
 using std::vector;
 using std::shared_ptr;
 
+
+typedef struct _textureInfo {
+    std::string texturePath;
+    GLenum format;
+} TextureInfo;
+
 class Object {
     private:
         GLuint defaultProgram;
@@ -24,36 +33,44 @@ class Object {
                 center{0.f};
         glm::mat4 transform{1.f},
                 colorFilter{1.f};
+        std::vector<TextureInfo> textures;
 
         void updateCenter();
     public:
         Object(GLuint program) : defaultProgram(program) {};
         void setDefaultProgram(GLuint program);
         decltype(defaultProgram) getDefaultProgram();
-
+        
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
             const vector<glm::vec3>& points,
+            const vector<glm::vec3>& normals,
+            const vector<glm::vec2>& uvs,
             const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList
         );
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
             const vector<glm::vec3>& points,
+            const vector<glm::vec3>& normals,
+            const vector<glm::vec2>& uvs,
             const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList,
             GLuint program
         );
-
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
             const vector<glm::vec2>& points,
+            const vector<glm::vec3>& normals,
+            const vector<glm::vec2>& uvs,
             const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList
         );
         void pushElement(
             decltype(GL_TRIANGLES) drawType,
             const vector<glm::vec2>& points,
+            const vector<glm::vec3>& normals,
+            const vector<glm::vec2>& uvs,
             const vector<glm::vec4>& colors,
             const vector<GLuint>& elementList,
             GLuint program
@@ -75,6 +92,8 @@ class Object {
         void applyColorFilter(GLuint target);
         void applyColorFilter(const glm::mat4& m);
         void applyColorFilter(const glm::mat4& m, GLuint target);
+
+        void applyTexture(std::vector<GLuint> &textureIDs);
 
         glm::vec3 getPosition();
         void setPosition(const glm::vec3& pos);

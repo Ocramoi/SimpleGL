@@ -71,9 +71,12 @@ void Object::applyColorFilter(const glm::mat4& m, GLuint target) {
     glUniformMatrix4fv(matColor, 1, GL_TRUE, glm::value_ptr(colorFilter));
 }
 
+
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
     const vector<glm::vec3>& points,
+    const vector<glm::vec3>& normals,
+    const vector<glm::vec2>& uvs,
     const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList,
     GLuint program
@@ -85,6 +88,8 @@ void Object::pushElement(
             program,
             drawType,
             points,
+            normals,
+            uvs,
             colors,
             sequence
         ));
@@ -93,6 +98,8 @@ void Object::pushElement(
             program,
             drawType,
             points,
+            normals,
+            uvs,
             colors,
             elementList
         ));
@@ -104,15 +111,19 @@ void Object::pushElement(
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
     const vector<glm::vec3>& points,
+    const vector<glm::vec3>& normals,
+    const vector<glm::vec2>& uvs,
     const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList
 ) {
-    pushElement(drawType, points, colors, elementList, defaultProgram);
+    pushElement(drawType, points, normals, uvs, colors, elementList, defaultProgram);
 }
 
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
     const vector<glm::vec2>& points,
+    const vector<glm::vec3>& normals,
+    const vector<glm::vec2>& uvs,
     const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList,
     GLuint program
@@ -127,6 +138,8 @@ void Object::pushElement(
             program,
             drawType,
             points3d,
+            normals,
+            uvs,
             colors,
             sequence
         ));
@@ -135,6 +148,8 @@ void Object::pushElement(
             program,
             drawType,
             points3d,
+            normals,
+            uvs,
             colors,
             elementList
         ));
@@ -146,13 +161,36 @@ void Object::pushElement(
 void Object::pushElement(
     decltype(GL_TRIANGLES) drawType,
     const vector<glm::vec2>& points,
+    const vector<glm::vec3>& normals,
+    const vector<glm::vec2>& uvs,
     const vector<glm::vec4>& colors,
     const vector<GLuint>& elementList
 ) {
-    pushElement(drawType, points, colors, elementList, defaultProgram);
+    pushElement(drawType, points, normals, uvs, colors, elementList, defaultProgram);
 }
 
 auto Object::getCenter() -> decltype(center) { return position + center; }
 
 glm::vec3 Object::getPosition() { return position; }
 void Object::setPosition(const glm::vec3 &pos) { position = pos; }
+ 
+void Object::applyTexture (std::vector<GLuint> &textureIDs) {
+    SDL_Surface *image;
+    for (unsigned int i = 0; i < textures.size(); i++){ 
+        
+        image = IMG_Load(textures[i].texturePath.c_str()); 
+        if (image == NULL){
+            throw("Unable to get a texture from the file");
+        }
+
+        glGenTextures(1, &textureIDs[i]);
+        glBindTexture(GL_TEXTURE_2D, textureIDs[i]); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->w, image->h, 0, textures[i].format, GL_UNSIGNED_BYTE, image->pixels);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}

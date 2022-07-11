@@ -4,6 +4,10 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
+
 
 using std::exit;
 using std::cout;
@@ -108,3 +112,108 @@ void Utils::setView(GLuint program, glm::mat4 Model) {
     auto vTransf{glGetUniformLocation(program, "viewMatrix")};
     glUniformMatrix4fv(vTransf, 1, GL_TRUE, glm::value_ptr(Model));
 }
+
+bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<glm::vec3>& normals, std::vector<int>& textureGroups){
+    std::vector<unsigned int > vertexIndices, uvIndices, normalIndices;
+    std::vector<glm::vec3> tempVertices;
+    std::vector<glm::vec2> tempUvs;
+    std::vector<glm::vec3> tempNormals;
+
+    bool firstGroup = true;
+    int numberOfVertices = 0;
+
+    FILE* file = fopen(path, "r");
+    if (file == NULL){
+        return false;
+    } 
+
+    while (true) {
+
+
+        char lineHeader[128];
+        int res = fscanf(file, "%s", lineHeader);
+        std::cout << lineHeader;
+
+        if (res == EOF) {
+            break; 
+        }
+
+        // Reads vertices, textures, normals, faces and texture groups
+        if (strcmp(lineHeader, "v") == 0) {
+            glm::vec3 vertex;
+            fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+            tempVertices.push_back(vertex);
+        } else if ( strcmp( lineHeader, "vt" ) == 0 ) {
+            glm::vec2 uv;
+            fscanf(file, "%f %f\n", &uv.x, &uv.y );
+            tempUvs.push_back(uv);
+        } else if (strcmp(lineHeader, "vn") == 0) {
+            glm::vec3 normal;
+            fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+            tempNormals.push_back(normal);
+        } else if (strcmp(lineHeader, "f") == 0) {
+            std::string vertex1, vertex2, vertex3;
+            unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+            
+            long int before_position = ftell(file);
+            int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
+            
+            // If doesn't have normal
+            if (matches != 9){ 
+                fseek(file, before_position, SEEK_SET);
+                fscanf(file, "%d/%d %d/%d %d/%d\n", &vertexIndex[0], &uvIndex[0], &vertexIndex[1], &uvIndex[1], &vertexIndex[2], &uvIndex[2]);
+            }
+
+            // Auxiliary vectors
+            vertexIndices.push_back(vertexIndex[0]); 
+            vertexIndices.push_back(vertexIndex[1]);
+            vertexIndices.push_back(vertexIndex[2]);
+            uvIndices    .push_back(uvIndex[0]);
+            uvIndices    .push_back(uvIndex[1]);
+            uvIndices    .push_back(uvIndex[2]);
+            normalIndices.push_back(normalIndex[0]);
+            normalIndices.push_back(normalIndex[1]);
+            normalIndices.push_back(normalIndex[2]);
+            
+            numberOfVertices += 3;
+
+        } else if (strcmp(lineHeader, "g") == 0 || strcmp(lineHeader, "usemtl") == 0) { 
+            if (firstGroup) {
+                firstGroup = false;
+            } else {
+                textureGroups.push_back(numberOfVertices);
+                numberOfVertices = 0; 
+            }
+        }
+    }
+    textureGroups.push_back(numberOfVertices);
+
+    for (unsigned int i = 0; i < vertexIndices.size(); i++) {
+        unsigned int vertexIndex = vertexIndices[i];
+        glm::vec3 vertex = tempVertices[vertexIndex - 1];
+        vertices.push_back(vertex);
+    }
+
+    for (unsigned int i = 0; i < uvIndices.size(); i++) {
+        unsigned int uvIndex = uvIndices[i];
+        glm::vec2 uv = tempUvs[uvIndex - 1];
+        uvs.push_back(uv);
+    }
+
+    for (unsigned int i = 0; i < normalIndices.size(); i++) {
+        unsigned int normalIndex = normalIndices[i];
+        glm::vec3 normal = tempNormals[normalIndex - 1];
+        normals.push_back(normal);
+    }
+
+    fclose(file);
+    return true;
+}
+
+// void Utils::loadObject(GLuint program, std::string filePath, std::vector<TextureInfo> textures, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals, std::vector<glm::vec2>& uvs){
+    
+//     //Se houve erro em abrir o .obj joga um excecao
+//     if (!loadObjectFromFile(filePath.c_str(), vertices, uvs, normals, textureGroups)){
+//         throw("Unable to get an object from the file");
+//     }
+// }

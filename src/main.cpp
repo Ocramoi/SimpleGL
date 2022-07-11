@@ -20,6 +20,8 @@ void display(GLFWwindow* win, GLuint rProgram, GLuint vao, double currentTime);
 unique_ptr<Object> Delaunay;
 unique_ptr<Camera> camera;
 
+std::vector<int> textureGroups;
+
 void display(
     Window& win,
     const double& currentTime
@@ -94,20 +96,39 @@ int main() {
     camera->setSensitivity(0.2f);
 
     Delaunay = make_unique<Object>(renderProgram);
+
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec2> uvs;
+    std::vector<glm::vec3> normals;
+    std::vector<TextureInfo> textures;
+    string filePath = "/home/random/Documents/2022.1/Computação Gráfica/T2/SimpleGL/src/build/sun.obj";
+    if (!Utils::loadObjectFromFile(filePath.c_str(), vertices, uvs, normals, textureGroups)){
+        printf("oops");
+        return 0;
+    }
+    
+    std::vector<GLuint> elementList{};
+    for (int i = 0; i < int(vertices.size()); ++i) {
+        elementList.push_back(i);
+    }
+
     Delaunay->pushElement(
         GL_TRIANGLE_STRIP,
-        { { -0.1f, 0.f, 0.f }, { 0.f, 0.1f, 0.f }, { 0.1f, 0.f, 0.f }, { 0, 0, 0.1f } },
-        { { 1, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }, { 1, 1, 1, 1 } },
-        { 0, 1, 2, 3, 0, 1 }
-    );
-    Delaunay->pushElement(
-        GL_LINE_STRIP,
-        { { -0.1f, 0.f, 0.f }, { 0.f, 0.1f, 0.f }, { 0.1f, 0.f, 0.f }, { 0, 0, 0.1f } },
-        { { 0, 0, 0, 1 } },
-        { 0, 1, 2, 3, 0, 2, 1, 3 }
+        vertices,
+        normals,
+        uvs,
+        {{ 0, 0, 1, 0 }},
+        elementList
+
     );
 
-    window.clear({ 1., 0., 1., 1. });
+    for(auto i : elementList){
+        std::cout << i << endl;
+    }
+
+    std::cout << elementList.size() << endl;
+
+    window.clear({ 1., 1., 1., 1. });
     while (!glfwWindowShouldClose(window.get())) {
         display(window, glfwGetTime());
         glfwPollEvents();

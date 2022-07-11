@@ -4,18 +4,18 @@
 # @file
 # @version 0.1
 
-CC=clang++
+CC=g++
 SRC_FILES=main.cpp $(wildcard **/*.cpp)
 SRC_FILES:=$(filter-out $(wildcard **/flycheck_*.cpp), $(SRC_FILES))
-EXEC=../build/main
+EXEC= ./build/main
 DEXEC=../build/debug
 OBJ_FOLDER=objs
 COMPILE_FLAGS=-Wextra -Ofast -std=gnu++17
-DEBUG_FLAGS=-Wextra -Og -g3 -DDEBUG -std=gnu++17
+DEBUG_FLAGS=-Wextra -DDEBUG -std=gnu++17
 VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all --track-origins=yes -s
-LD_FLAGS:=-lGL -lglfw -lGLEW
+LD_FLAGS:=-lGL -lglfw -lGLEW -lSDL2_image -lSDL2
 
-all: setup classes.o utils.o main.o
+all: classes.o utils.o main.o
 	$(CC) $(COMPILE_FLAGS) *.o -o $(EXEC) $(LD_FLAGS)
 
 main.o: main.cpp
