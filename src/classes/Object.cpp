@@ -30,8 +30,6 @@ void Object::draw() {
         el->draw();
 }
 
-#include <iostream>
-
 void Object::setTransform(const glm::mat4& m) {
     transform = m;
     glm::vec4 toCenter{0, 0, 0, 1};
