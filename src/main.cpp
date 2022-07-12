@@ -17,8 +17,9 @@ using namespace std;
 void keyHandler(GLFWwindow* win);
 void display(GLFWwindow* win, GLuint rProgram, GLuint vao, double currentTime);
 
-unique_ptr<Object> Delaunay;
 unique_ptr<Camera> camera;
+unique_ptr<Object> sun,
+    cadeira;
 
 void display(
     Window& win,
@@ -28,17 +29,22 @@ void display(
 
     auto fTime{static_cast<float>(currentTime)};
     glm::mat4 model{1.f};
-    model = glm::scale(model, { 0.1, 0.1, 0.1 });
-    model = glm::translate(model, { cos(currentTime)*.5f, 0, 0 });
+    model = glm::translate(model, { 10, 10, 10 });
+    model = glm::scale(model, { 0.07, 0.07, 0.07 });
     model = glm::rotate(model, fTime, { 0, 0, 1 });
     model = glm::rotate(model, fTime/2, { 0, 1, 0 });
     model = glm::rotate(model, fTime/3, { 1, 0, 0 });
 
-    Utils::setProjection(Delaunay->getDefaultProgram(), win.getPerspective());
-    camera->setView(Delaunay->getDefaultProgram());
-    Delaunay->applyColorFilter();
-    Delaunay->applyTransform(glm::transpose(model));
-    Delaunay->draw();
+    sun->setupDefaultRenderer(camera, win);
+    sun->applyColorFilter();
+    sun->applyTransform(glm::transpose(model));
+    sun->draw();
+
+    cadeira->setupDefaultRenderer(camera, win);
+    sun->emitLight({ 1.0, 0.8392, 0.2509 });
+    cadeira->applyColorFilter();
+    cadeira->applyTransform(glm::Identity4);
+    cadeira->draw();
 
     win.update();
 }
@@ -89,19 +95,29 @@ int main() {
             size,
             "Teste",
             nullptr, nullptr };
-    auto renderProgram{Utils::createRenderProgram("vShader.glsl", "fShader.glsl")};
+
+    unordered_map<string, decltype(Utils::createRenderProgram("", ""))> programs;
+    programs.emplace("defaultProgram", Utils::createRenderProgram("vShader.glsl", "fShader.glsl"));
+    programs.emplace("lightSourceProgram", Utils::createRenderProgram("vShader.glsl", "fLightSourceShader.glsl"));
 
     camera = make_unique<Camera>(glm::vec3{ 0, 0, -1 }, 2.f);
     camera->setSensitivity(0.2f);
 
-    Delaunay = make_unique<Object>(renderProgram);
-    if (!Delaunay->loadFromFile("../assets/sun.obj", "../assets/sun.jpg")) {
+    cadeira = make_unique<Object>(programs.at("defaultProgram"));
+    if (!cadeira->loadFromFile("../assets/bancoFora/banqueta.obj", "../assets/bancoFora/plastic-chair.jpg")) {
         cerr << "Error loading model!" << endl;
-        Utils::deletePrograms(renderProgram);
+        Utils::deleteProgramDict(programs);
         return 1;
     }
 
-    window.clear({ 1., 1., 1., 1. });
+    sun = make_unique<Object>(programs.at("lightSourceProgram"));
+    if (!sun->loadFromFile("../assets/sun/sun.obj", "../assets/sun/sun.jpg")) {
+        cerr << "Error loading model!" << endl;
+        Utils::deleteProgramDict(programs);
+        return 1;
+    }
+
+    window.clear({ .4588, .6666, 1., 1. });
     while (!glfwWindowShouldClose(window.get())) {
         display(window, glfwGetTime());
         glfwPollEvents();
@@ -109,10 +125,13 @@ int main() {
         mouseHandler(window);
 
         auto err{glGetError()};
-        if (err != GL_NO_ERROR) cerr << "OpenGL error: " << err << endl;
+        if (err != GL_NO_ERROR) {
+            cerr << "OpenGL error: " << err << endl;
+            cerr << "\t" << gluErrorString(err) << endl;
+        }
     }
 
-    Utils::deletePrograms(renderProgram);
+    Utils::deleteProgramDict(programs);
 
     return 0;
 }

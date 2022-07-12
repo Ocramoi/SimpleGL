@@ -190,3 +190,10 @@ bool Utils::loadObjectFromFile(const char* path, std::vector<glm::vec3>& vertice
     fclose(file);
     return true;
 }
+
+auto Utils::deleteProgramDict(
+    const unordered_map<string, decltype(createRenderProgram("", ""))>& programs
+) -> decltype(deleteProgramDict({})) {
+    for (const auto& program : programs)
+        deletePrograms(program.second);
+}

@@ -19,7 +19,7 @@ void Object::draw() {
     if (textured) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
-        glUniform1i(3, 0);
+        glUniform1i(4, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -30,7 +30,14 @@ void Object::draw() {
         el->draw();
 }
 
-void Object::setTransform(const glm::mat4& m) { transform = m; }
+#include <iostream>
+
+void Object::setTransform(const glm::mat4& m) {
+    transform = m;
+    glm::vec4 toCenter{0, 0, 0, 1};
+    toCenter = glm::transpose(transform) * toCenter;
+    normCenter = { toCenter.x, toCenter.y, toCenter.z };
+}
 auto Object::getTransform() -> decltype(transform) { return transform; }
 
 void Object::applyTransform() {
@@ -200,4 +207,15 @@ auto Object::loadFromFile(
     SOIL_free_image_data(image);
 
     return true;
+}
+
+void Object::setupDefaultRenderer(const unique_ptr<Camera> &camera, Window& win) {
+    glUseProgram(getDefaultProgram());
+    Utils::setProjection(getDefaultProgram(), win.getPerspective());
+    camera->setView(getDefaultProgram());
+}
+
+void Object::emitLight(const glm::vec3 &lightColor) {
+    glUniform3fv(5, 1, glm::value_ptr(normCenter));
+    glUniform3fv(6, 1, glm::value_ptr(lightColor));
 }

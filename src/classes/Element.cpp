@@ -17,6 +17,7 @@ Element::Element(
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &cbo);
     glGenBuffers(1, &uvo);
+    glGenBuffers(1, &no);
     glGenBuffers(1, &ebo);
 
     glBindVertexArray(vao);
@@ -45,6 +46,14 @@ Element::Element(
         GL_DYNAMIC_DRAW
     );
 
+    glBindBuffer(GL_ARRAY_BUFFER, no);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        normals.size() * sizeof(decltype(normals[0])),
+        normals.data(),
+        GL_DYNAMIC_DRAW
+    );
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -64,6 +73,10 @@ Element::Element(
     glBindBuffer(GL_ARRAY_BUFFER, uvo);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 2*sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, no);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 3*sizeof(GLfloat), nullptr);
+    glEnableVertexAttribArray(3);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

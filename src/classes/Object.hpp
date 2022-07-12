@@ -14,6 +14,8 @@
 
 #include "./Element.hpp"
 #include "../utils/util.hpp"
+#include "./Camera.hpp"
+#include "../utils/Window.hpp"
 
 using std::vector;
 using std::shared_ptr;
@@ -28,7 +30,7 @@ class Object {
         GLuint defaultProgram;
         vector<shared_ptr<Element>> elements;
         glm::vec3 position{0.f},
-                center{0.f};
+                normCenter{0.f};
         glm::mat4 transform{1.f},
                 colorFilter{1.f};
         bool textured{false};
@@ -93,10 +95,12 @@ class Object {
         void applyColorFilter(const glm::mat4& m, GLuint target);
 
         bool loadFromFile(const string& objPath, const string& texturePath);
-        // void applyTexture(std::vector<GLuint> &textureIDs);
 
         glm::vec3 getPosition();
         void setPosition(const glm::vec3& pos);
+
+        void setupDefaultRenderer(const unique_ptr<Camera>& camera, Window& win);
+        void emitLight(const glm::vec3& lightColor);
 
         void draw();
 };
