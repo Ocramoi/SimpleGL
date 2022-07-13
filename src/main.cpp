@@ -19,7 +19,12 @@ void display(GLFWwindow* win, GLuint rProgram, GLuint vao, double currentTime);
 
 unique_ptr<Camera> camera;
 unique_ptr<Object> sun,
-    cadeira;
+    amongus,
+    cadeira,
+    casa,
+    chair
+    // pato
+    ;
 
 void display(
     Window& win,
@@ -40,12 +45,45 @@ void display(
     sun->applyTransform(glm::transpose(model));
     sun->draw();
 
+    glm::mat4 cdModel{1.f};
+    cdModel = glm::translate(cdModel, {0, 0, 5});
     cadeira->setupDefaultRenderer(camera, win);
-    sun->emitLight({ 1.0, 0.8392, 0.2509 });
     cadeira->applyColorFilter();
-    cadeira->applyTransform(glm::Identity4);
+    cadeira->applyTransform(glm::transpose(cdModel));
     cadeira->draw();
 
+    glm::mat4 amModel{1.f};
+    amModel = glm::scale(amModel, {0.02, 0.02, 0.02});
+    amModel = glm::translate(amModel, {100, 0, 100});
+    amongus->setupDefaultRenderer(camera, win);
+    amongus->applyColorFilter();
+    amongus->applyTransform(glm::transpose(amModel));
+    amongus->draw();
+
+    glm::mat4 casaModel{1.f};
+    casaModel = glm::scale(casaModel, {0.5, 0.5, 0.5});
+    casa->setupDefaultRenderer(camera, win);
+    casa->applyColorFilter();
+    casa->applyTransform(glm::transpose(casaModel));
+    casa->draw();
+
+    // glm::mat4 patoModel{1.f};
+    // patoModel = glm::scale(patoModel, {0.02, 0.02, 0.02});
+    // patoModel = glm::translate(patoModel, {200, 200, 200});
+    // pato->setupDefaultRenderer(camera, win);
+    // pato->applyColorFilter();
+    // pato->applyTransform(glm::transpose(patoModel));
+    // pato->draw();
+
+    glm::mat4 chair_model{1.f};
+    chair_model = glm::translate(chair_model, {0, 0, 2});
+    chair_model = glm::scale(chair_model, {0.2, 0.2, 0.2});
+    chair->setupDefaultRenderer(camera, win);
+    chair->applyColorFilter();
+    chair->applyTransform(glm::transpose(chair_model));
+    chair->draw();
+
+    sun->emitLight({ 1.0, 0.8392, 0.2509 });
     win.update();
 }
 
@@ -110,12 +148,41 @@ int main() {
         return 1;
     }
 
+    amongus = make_unique<Object>(programs.at("defaultProgram"));
+    if (!amongus->loadFromFile("../assets/amongus/amongus.obj", "../assets/amongus/amongus.png")) {
+        cerr << "Error loading model!" << endl;
+        Utils::deleteProgramDict(programs);
+        return 1;
+    }
+
+    casa = make_unique<Object>(programs.at("defaultProgram"));
+    if (!casa->loadFromFile("../assets/casa/house.obj", "../assets/casa/textures/DoorsWoodSingleOld0107_1_M.jpg")) {
+        cerr << "Error loading model!" << endl;
+        Utils::deleteProgramDict(programs);
+        return 1;
+    }
+
+    // pato = make_unique<Object>(programs.at("defaultProgram"));
+    // if (!pato->loadFromFile("../assets/pato/pato.obj", "../assets/pato/pato.png")) {
+    //     cerr << "Error loading model!" << endl;
+    //     Utils::deleteProgramDict(programs);
+    //     return 1;
+    // }
+
+    chair = make_unique<Object>(programs.at("defaultProgram"));
+    if (!chair->loadFromFile("../assets/cadeiraDentro/cadeiraDentro.obj", "../assets/cadeiraDentro/cadeiraDentro.png")) {
+        cerr << "Error loading model!" << endl;
+        Utils::deleteProgramDict(programs);
+        return 1;
+    }
+
     sun = make_unique<Object>(programs.at("lightSourceProgram"));
     if (!sun->loadFromFile("../assets/sun/sun.obj", "../assets/sun/sun.jpg")) {
         cerr << "Error loading model!" << endl;
         Utils::deleteProgramDict(programs);
         return 1;
     }
+
 
     window.clear({ .4588, .6666, 1., 1. });
     while (!glfwWindowShouldClose(window.get())) {
